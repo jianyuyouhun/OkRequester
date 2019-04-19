@@ -15,7 +15,7 @@ import okhttp3.ResponseBody;
  * 将http结果处理为stream
  */
 @SuppressWarnings("unused")
-public class InputStreamResponseParse implements ResponseParser<InputStream> {
+public class InputStreamResponseParser implements ResponseParser<InputStream> {
 
     private Handler handler = HttpHolder.getInstance().getHandler();
 

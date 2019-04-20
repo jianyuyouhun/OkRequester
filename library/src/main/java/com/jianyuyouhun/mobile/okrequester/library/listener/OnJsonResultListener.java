@@ -34,7 +34,7 @@ public abstract class OnJsonResultListener<Data> implements OnHttpResultListener
                 code = parseCode(jsonObject);
                 msg = parseMsg(jsonObject);
                 if (code == successCode) {
-                    onResultData(code, onDumpData(jsonObject), msg);
+                    onResultData(code, onDumpData(parseDataJson(jsonObject)), msg);
                 } else {
                     onResultData(code, null, msg);
                 }
@@ -70,29 +70,40 @@ public abstract class OnJsonResultListener<Data> implements OnHttpResultListener
      * @param data
      * @param msg
      */
-    public abstract void onResultData(int code, @Nullable Data data, String msg);
+    protected abstract void onResultData(int code, @Nullable Data data, String msg);
 
     /**
+     * 字符串转json
+     * @param in
+     * @return
+     * @throws JSONException
+     */
+    private JSONObject parseJsonObject(String in) throws JSONException {
+        return new JSONObject(in);
+    }
+
+    /**
+     *
      * 解析jsonObject用于实体转换，如果只取in的部分作为json则可重写此方法处理
      * @param in    string
      * @return
      * @throws JSONException
      */
-    public JSONObject parseJsonObject(String in) throws JSONException {
-        return new JSONObject(in);
+    protected JSONObject parseDataJson(JSONObject in) throws JSONException {
+        return in;
     }
 
     /**
      * 获取api-code码，默认为code，可重写此方法修改
      */
-    public int parseCode(JSONObject jsonObject) {
+    protected int parseCode(JSONObject jsonObject) {
         return jsonObject.optInt("code", failedCode);
     }
 
     /**
      * 获取异常信息文本，默认为msg，可重写此方法修改
      */
-    public String parseMsg(JSONObject jsonObject) {
+    protected String parseMsg(JSONObject jsonObject) {
         return jsonObject.optString("msg");
     }
 

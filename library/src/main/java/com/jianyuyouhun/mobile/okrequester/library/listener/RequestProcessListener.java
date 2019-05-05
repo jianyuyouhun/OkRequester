@@ -9,6 +9,6 @@ import java.util.Map;
 
 public interface RequestProcessListener {
     void onPreRequest(String url, String route, Map<String, Object> params);
-    void onResult(String content);
+    void onResult(int code, String url, String route, String content);
     void onError(String url, String route, Exception e);
 }

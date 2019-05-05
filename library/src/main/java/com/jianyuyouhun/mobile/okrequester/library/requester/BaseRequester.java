@@ -3,14 +3,15 @@ package com.jianyuyouhun.mobile.okrequester.library.requester;
 import android.support.annotation.NonNull;
 
 import com.jianyuyouhun.mobile.okrequester.library.HttpHolder;
-import com.jianyuyouhun.mobile.okrequester.library.listener.OnHttpResultListener;
+import com.jianyuyouhun.mobile.okrequester.library.listener.ErrorCode;
+import com.jianyuyouhun.mobile.okrequester.library.listener.HttpResultParser;
+import com.jianyuyouhun.mobile.okrequester.library.listener.OnResultListener;
 import com.jianyuyouhun.mobile.okrequester.library.listener.RequestProcessListener;
 import com.jianyuyouhun.mobile.okrequester.library.requester.annotation.BodyCreator;
 import com.jianyuyouhun.mobile.okrequester.library.requester.annotation.RequestMethod;
 import com.jianyuyouhun.mobile.okrequester.library.requester.annotation.Route;
 import com.jianyuyouhun.mobile.okrequester.library.requester.creator.BodyCreatorAction;
 import com.jianyuyouhun.mobile.okrequester.library.requester.creator.FormBodyCreator;
-import com.jianyuyouhun.mobile.okrequester.library.requester.parser.ResponseParser;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -21,26 +22,52 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
+
+import static java.net.HttpURLConnection.HTTP_OK;
 
 
 /**
- * 请求基类，请求体只负责请求结果数据，请求结果转为字符串
- * 数据的结果处理交给listener完成
+ * 请求基类
  * Created by wangyu on 2018/6/9.
  */
 
 @SuppressWarnings("ALL")
 @BodyCreator(FormBodyCreator.class)
-public abstract class BaseRequester<In> {
+public abstract class BaseRequester<Out, In> {
 
     private HttpHolder httpHolder = HttpHolder.getInstance();
 
-    protected OnHttpResultListener<In> listener;
+    protected OnResultListener<Out> listener;
 
-    private ResponseParser<In> responseParser;
+    private HttpResultParser httpResultParser = new HttpResultParser() {
+        @Override
+        public void onResult(int code, String content, @NonNull String msg) {
+            for (RequestProcessListener processListener : httpHolder.getRequestProcessListeners()) {
+                processListener.onResult(code, setReqUrl(), setRoute(), content);
+            }
+            try {
+                if (code == HTTP_OK) {
+                    In in = parseIn(content);
+                    BaseRequester.this.onResult(parseCode(in), in, parseMessage(in));
+                } else {
+                    BaseRequester.this.onResult(code, null, "");
+                }
+            } catch (Exception exception) {
+                onError(exception);
+            }
+        }
 
-    public BaseRequester(@NonNull ResponseParser<In> responseParser, @NonNull OnHttpResultListener<In> listener) {
-        this.responseParser = responseParser;
+        @Override
+        public void onError(Exception e) {
+            for (RequestProcessListener processListener : httpHolder.getRequestProcessListeners()) {
+                processListener.onError(setReqUrl(), setRoute(), e);
+            }
+            BaseRequester.this.onError(e);
+        }
+    };
+
+    public BaseRequester(@NonNull OnResultListener<Out> listener) {
         this.listener = listener;
     }
 
@@ -53,9 +80,6 @@ public abstract class BaseRequester<In> {
         }, delay);
     }
 
-    /**
-     * 执行请求，结果将传递到listener处理
-     */
     public void execute() {
         httpHolder.getExecutorService().execute(new Runnable() {
             @Override
@@ -68,13 +92,9 @@ public abstract class BaseRequester<In> {
                 HttpMethod method = setMethod();
                 switch (method) {
                     case GET:
-                    case DELETE:
-                    case HEAD:
                         url = appendGetParams(url, params);
                         break;
                     case POST:
-                    case PUT:
-                    case PATCH:
                         requestBody = onBuildRequestBody(params);
                         break;
                 }
@@ -88,22 +108,40 @@ public abstract class BaseRequester<In> {
                 }
                 try {
                     final Response response = client.newCall(request).execute();
-                    if (HttpHolder.isDebug) {
-                        if (response == null) {
-                            for (RequestProcessListener processListener : httpHolder.getRequestProcessListeners()) {
-                                processListener.onError(setReqUrl(), setRoute(), new NullPointerException("response is null"));
+                    if (response == null) {
+                        httpHolder.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                httpResultParser.onResult(ErrorCode.RESULT_BODY_EMPTY, null, "");
                             }
+                        });
+                    } else {
+                        if (response.isSuccessful()) {
+                            ResponseBody body = response.body();
+                            final String result = body != null ? body.string() : "";
+                            httpHolder.getHandler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    httpResultParser.onResult(response.code(), result, "");
+                                }
+                            });
+                        } else {
+                            httpHolder.getHandler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    httpResultParser.onResult(ErrorCode.RESULT_NET_ERROR, "", "");
+                                }
+                            });
                         }
                     }
-                    responseParser.onParseResponse(response, listener);
                 } catch (final IOException e) {
                     e.printStackTrace();
-                    if (HttpHolder.isDebug) {
-                        for (RequestProcessListener processListener : httpHolder.getRequestProcessListeners()) {
-                            processListener.onError(setReqUrl(), setRoute(), e);
+                    httpHolder.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            httpResultParser.onError(e);
                         }
-                    }
-                    responseParser.onError(e, listener);
+                    });
                 }
             }
         });
@@ -248,5 +286,54 @@ public abstract class BaseRequester<In> {
         return result;
     }
 
-}
+    /**
+     * 统一解析请求的code码
+     *
+     * @param in 服务端返回的数据
+     * @return code
+     */
+    protected abstract int parseCode(@NonNull In in);
 
+    /**
+     * 统一解析请求的message
+     *
+     * @param in 服务端返回的数据
+     * @return msg
+     */
+    protected abstract String parseMessage(@NonNull In in);
+
+    /**
+     * 请求失败了
+     *
+     * @param exception 失败原因
+     */
+    protected void onError(@NonNull Exception exception) {
+        exception.printStackTrace();
+        listener.onResult(OnResultListener.RESULT_NET_ERROR, null, exception.getMessage());
+    }
+
+
+    /**
+     * 请求成功了  服务器已经返回结果
+     *
+     * @param code 请求成功的HTTP返回吗，，一般code等于200表示请求成功
+     * @param in   从服务器获取到的数据
+     */
+    protected void onResult(int code, In in, String msg) throws Exception {
+        Out data = null;
+        if (code == OnResultListener.RESULT_DATA_OK) {
+            data = onDumpData(in);
+        }
+        listener.onResult(code, data, msg);
+    }
+
+    protected abstract Out onDumpData(@NonNull In in) throws Exception;
+
+    /**
+     * 把服务器返回的数据改为要的格式
+     *
+     * @param content
+     * @return
+     */
+    protected abstract In parseIn(@NonNull String content) throws Exception;
+}

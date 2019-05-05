@@ -1,11 +1,14 @@
 package com.jianyuyouhun.mobile.okrequester.library.listener;
 
+
+import com.jianyuyouhun.mobile.okrequester.library.HttpHolder;
 import com.jianyuyouhun.mobile.okrequester.library.Logger;
 
 import java.util.Locale;
 import java.util.Map;
 
 /**
+ *
  * Created by wangyu on 2018/6/10.
  */
 
@@ -14,27 +17,33 @@ public class DefaultProcessListener implements RequestProcessListener {
 
     @Override
     public void onPreRequest(String url, String route, Map<String, Object> params) {
-        String string = String.format(Locale.getDefault(), "request, url = %s", url + "?" + logParams(params));
-        Logger.i(TAG, string);
+        if (HttpHolder.isDebug) {
+            String string = String.format(Locale.getDefault(), "request, url = %s", url + "?" + logParams(params));
+            Logger.i(TAG, string);
+        }
     }
 
     @Override
-    public void onResult(String content) {
-        String serverContent = content == null ? "null" : content.replace("%", "%%");
-        String string = String.format(Locale.getDefault(), "response, content = %s", serverContent);
-        Logger.i(TAG, string);
+    public void onResult(int code, String url, String route, String content) {
+        if (HttpHolder.isDebug) {
+            String serverContent = content == null ? "null" : content.replace("%", "%%");
+            String string = String.format(Locale.getDefault(), "response, url = %s, code = %d, content = %s", url, code, serverContent);
+            Logger.i(TAG, string);
+        }
     }
 
     @Override
     public void onError(String url, String route, Exception e) {
-        String string = String.format(Locale.getDefault(), "response, url = %s, error = %s", url, e);
-        Logger.i(TAG, string);
+        if (HttpHolder.isDebug) {//调试模式下打印web请求日志
+            String string = String.format(Locale.getDefault(), "response, url = %s, error = %s", url, e);
+            Logger.i(TAG, string);
+        }
     }
 
     /**
      * 获取要打印的请求参数
      *
-     * @param params 表单
+     * @param params  表单
      * @return 拼接后的参数字符串
      */
     private String logParams(Map<String, Object> params) {

@@ -6,9 +6,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jianyuyouhun.mobile.okrequester.library.listener.OnHttpResultListener;
+import com.jianyuyouhun.mobile.okrequester.library.listener.ErrorCode;
 import com.jianyuyouhun.mobile.okrequester.library.requester.ApiInterface;
-import com.jianyuyouhun.mobile.okrequester.library.requester.BaseStringRequester;
+import com.jianyuyouhun.mobile.okrequester.library.requester.BaseJsonRequester;
+import com.jianyuyouhun.mobile.okrequester.library.requester.BaseRequester;
 
 import java.util.Map;
 
@@ -21,24 +22,34 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final TextView textView = findViewById(R.id.text);
-        BaseStringRequester requester = new BaseStringRequester(new OnHttpResultListener<String>() {
-            @Override
-            public void onResult(int code, String s, String msg) {
-                if (code == HTTP_OK) {
-                    textView.setText(s);
-                } else {
-                    Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+        new BaseRequester<String, String>((code, s, msg) -> {
+            textView.setText(s);
         }) {
+
             @Override
             protected void onPutParams(@NonNull Map<String, Object> params) {
 
+            }
+
+            @NonNull
+            @Override
+            protected ApiInterface getApi() {
+                return () -> "http://www.baidu.com";
+            }
+
+            @Override
+            protected int parseCode(@NonNull String s) {
+                return ErrorCode.RESULT_DATA_OK;
+            }
+
+            @Override
+            protected String parseMessage(@NonNull String s) {
+                return "";
+            }
+
+            @Override
+            protected String onDumpData(@NonNull String s) throws Exception {
+                return s;
             }
 
             @NonNull
@@ -47,12 +58,10 @@ public class MainActivity extends AppCompatActivity {
                 return "";
             }
 
-            @NonNull
             @Override
-            protected ApiInterface getApi() {
-                return () -> "http://www.baidu.com";
+            protected String parseIn(@NonNull String content) throws Exception {
+                return content;
             }
-        };
-        requester.execute();
+        }.execute();
     }
 }

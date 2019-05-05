@@ -2,10 +2,10 @@ package com.jianyuyouhun.mobile.okrequester.library.upload;
 
 import android.support.annotation.NonNull;
 
-import com.jianyuyouhun.mobile.okrequester.library.listener.OnHttpResultListener;
+import com.jianyuyouhun.mobile.okrequester.library.listener.OnResultListener;
 import com.jianyuyouhun.mobile.okrequester.library.progress.OnProgressListener;
 import com.jianyuyouhun.mobile.okrequester.library.progress.ProgressHelper;
-import com.jianyuyouhun.mobile.okrequester.library.requester.BaseStringRequester;
+import com.jianyuyouhun.mobile.okrequester.library.requester.BaseJsonRequester;
 import com.jianyuyouhun.mobile.okrequester.library.requester.HttpMethod;
 import com.jianyuyouhun.mobile.okrequester.library.requester.annotation.BodyCreator;
 import com.jianyuyouhun.mobile.okrequester.library.requester.annotation.RequestMethod;
@@ -27,11 +27,11 @@ import static com.jianyuyouhun.mobile.okrequester.library.upload.MultiPartBodyCr
 @SuppressWarnings("ALL")
 @BodyCreator(MultiPartBodyCreator.class)
 @RequestMethod(value = HttpMethod.POST, isFinal = true)
-public abstract class MultiPartUploadRequester extends BaseStringRequester {
+public abstract class MultiPartUploadRequester<T> extends BaseJsonRequester<T> {
 
     private OnProgressListener onProgressListener;
 
-    public MultiPartUploadRequester(@NonNull OnProgressListener onProgressListener, @NonNull OnHttpResultListener listener) {
+    public MultiPartUploadRequester(@NonNull OnProgressListener onProgressListener, @NonNull OnResultListener<T> listener) {
         super(listener);
         this.onProgressListener = onProgressListener;
     }

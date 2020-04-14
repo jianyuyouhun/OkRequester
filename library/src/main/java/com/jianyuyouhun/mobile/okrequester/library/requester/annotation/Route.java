@@ -7,7 +7,9 @@ import java.lang.annotation.Target;
 
 /**
  * 路由配置
- * Created by wangyu on 2018/5/4.
+ *
+ * @author wangyu
+ * @date 2018/5/4
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

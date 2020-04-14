@@ -1,6 +1,5 @@
 package com.jianyuyouhun.mobile.okrequester.library.requester;
 
-import android.support.annotation.NonNull;
 import android.util.Xml;
 
 
@@ -9,6 +8,8 @@ import com.jianyuyouhun.mobile.okrequester.library.listener.OnResultListener;
 import org.xmlpull.v1.XmlPullParser;
 
 import java.io.StringReader;
+
+import androidx.annotation.NonNull;
 
 /**
  * xml格式请求基类

@@ -11,7 +11,9 @@ import okhttp3.RequestBody;
 
 /**
  * json格式参数解析
- * Created by wangyu on 2018/5/2.
+ *
+ * @author wangyu
+ * @date 2018/5/2
  */
 
 @SuppressWarnings("ALL")

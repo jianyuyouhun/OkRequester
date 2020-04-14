@@ -1,10 +1,9 @@
 package com.jianyuyouhun.mobile.okrequester.library.requester;
 
-import android.support.annotation.NonNull;
 
 import com.jianyuyouhun.mobile.okrequester.library.HttpHolder;
 import com.jianyuyouhun.mobile.okrequester.library.listener.ErrorCode;
-import com.jianyuyouhun.mobile.okrequester.library.listener.HttpResultParser;
+import com.jianyuyouhun.mobile.okrequester.library.listener.AbstractHttpResultParser;
 import com.jianyuyouhun.mobile.okrequester.library.listener.OnResultListener;
 import com.jianyuyouhun.mobile.okrequester.library.listener.RequestProcessListener;
 import com.jianyuyouhun.mobile.okrequester.library.requester.annotation.BodyCreator;
@@ -18,6 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -29,7 +29,9 @@ import static java.net.HttpURLConnection.HTTP_OK;
 
 /**
  * 请求基类
- * Created by wangyu on 2018/6/9.
+ *
+ * @author wangyu
+ * @date 2018/6/9
  */
 
 @SuppressWarnings("ALL")
@@ -40,7 +42,7 @@ public abstract class BaseRequester<Out, In> {
 
     protected OnResultListener<Out> listener;
 
-    private HttpResultParser httpResultParser = new HttpResultParser() {
+    private AbstractHttpResultParser abstractHttpResultParser = new AbstractHttpResultParser() {
         @Override
         public void onResult(int code, String content, @NonNull String msg) {
             for (RequestProcessListener processListener : httpHolder.getRequestProcessListeners()) {
@@ -112,7 +114,7 @@ public abstract class BaseRequester<Out, In> {
                         httpHolder.getHandler().post(new Runnable() {
                             @Override
                             public void run() {
-                                httpResultParser.onResult(ErrorCode.RESULT_BODY_EMPTY, null, "");
+                                abstractHttpResultParser.onResult(ErrorCode.RESULT_BODY_EMPTY, null, "");
                             }
                         });
                     } else {
@@ -122,14 +124,14 @@ public abstract class BaseRequester<Out, In> {
                             httpHolder.getHandler().post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    httpResultParser.onResult(response.code(), result, "");
+                                    abstractHttpResultParser.onResult(response.code(), result, "");
                                 }
                             });
                         } else {
                             httpHolder.getHandler().post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    httpResultParser.onResult(ErrorCode.RESULT_NET_ERROR, "", "");
+                                    abstractHttpResultParser.onResult(ErrorCode.RESULT_NET_ERROR, "", "");
                                 }
                             });
                         }
@@ -139,7 +141,7 @@ public abstract class BaseRequester<Out, In> {
                     httpHolder.getHandler().post(new Runnable() {
                         @Override
                         public void run() {
-                            httpResultParser.onError(e);
+                            abstractHttpResultParser.onError(e);
                         }
                     });
                 }

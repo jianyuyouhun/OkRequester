@@ -1,10 +1,7 @@
 package com.jianyuyouhun.mobile.okrequester.library.download;
 
-
-import android.support.annotation.NonNull;
-
 import com.jianyuyouhun.mobile.okrequester.library.HttpHolder;
-import com.jianyuyouhun.mobile.okrequester.library.progress.OnProgressListener;
+import com.jianyuyouhun.mobile.okrequester.library.progress.AbstractOnProgressListener;
 import com.jianyuyouhun.mobile.okrequester.library.progress.ProgressHelper;
 
 import java.io.File;
@@ -14,6 +11,7 @@ import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
+import androidx.annotation.NonNull;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Interceptor;
@@ -29,7 +27,7 @@ import okhttp3.ResponseBody;
 
 public class ContinuableDownloadRequester {
 
-    private OnProgressListener onProgressListener;
+    private AbstractOnProgressListener abstractOnProgressListener;
     private String url;
     private String filePath;
     private OkHttpClient okHttpClient;
@@ -42,12 +40,12 @@ public class ContinuableDownloadRequester {
      *
      * @param url                url
      * @param filePath           文件路径
-     * @param onProgressListener 监听
+     * @param abstractOnProgressListener 监听
      */
-    public ContinuableDownloadRequester(String url, String filePath, OnProgressListener onProgressListener) {
+    public ContinuableDownloadRequester(String url, String filePath, AbstractOnProgressListener abstractOnProgressListener) {
         this.url = url;
         this.filePath = filePath;
-        this.onProgressListener = onProgressListener;
+        this.abstractOnProgressListener = abstractOnProgressListener;
         okHttpClient = getProgressClient();
     }
 
@@ -63,7 +61,7 @@ public class ContinuableDownloadRequester {
         Interceptor interceptor = chain -> {
             Response originalResponse = chain.proceed(chain.request());
             return originalResponse.newBuilder()
-                    .body(ProgressHelper.withProgress(originalResponse.body(), onProgressListener))
+                    .body(ProgressHelper.withProgress(originalResponse.body(), abstractOnProgressListener))
                     .build();
         };
         return new OkHttpClient.Builder()
@@ -76,7 +74,7 @@ public class ContinuableDownloadRequester {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull final IOException e) {
-                httpHolder.getHandler().post(() -> onProgressListener.onFailed(e));
+                httpHolder.getHandler().post(() -> abstractOnProgressListener.onFailed(e));
             }
 
             @Override
@@ -89,7 +87,7 @@ public class ContinuableDownloadRequester {
     public void pause() {
         if (call != null) {
             call.cancel();
-            httpHolder.getHandler().post(() -> onProgressListener.onFailed(new RuntimeException("download canceled")));
+            httpHolder.getHandler().post(() -> abstractOnProgressListener.onFailed(new RuntimeException("download canceled")));
         }
     }
 

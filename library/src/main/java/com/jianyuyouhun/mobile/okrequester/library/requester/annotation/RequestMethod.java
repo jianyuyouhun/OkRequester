@@ -10,7 +10,9 @@ import java.lang.annotation.Target;
 
 /**
  * 请求类型注解
- * Created by wangyu on 2018/5/4.
+ *
+ * @author wangyu
+ * @date 2018/5/4
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

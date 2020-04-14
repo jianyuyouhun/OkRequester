@@ -12,7 +12,9 @@ import okhttp3.RequestBody;
 
 /**
  * 文件上传请求体封装
- * Created by wangyu on 2018/6/21.
+ *
+ * @author wangyu
+ * @date 2018/6/21
  */
 
 @SuppressWarnings("ALL")
@@ -31,7 +33,8 @@ public class MultiPartBodyCreator implements BodyCreatorAction {
         }
         for (String key : fileMap.keySet()) {
             File file = fileMap.get(key);
-            MediaType type = MediaType.parse("application/octet-stream");//"text/xml;charset=utf-8"
+            //"text/xml;charset=utf-8"
+            MediaType type = MediaType.parse("application/octet-stream");
             RequestBody fileBody = RequestBody.create(type, file);
             bodyBuilder.addFormDataPart(key, file.getName(), fileBody);
         }

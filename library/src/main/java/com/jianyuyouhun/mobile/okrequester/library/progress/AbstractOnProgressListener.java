@@ -1,30 +1,35 @@
 package com.jianyuyouhun.mobile.okrequester.library.progress;
 
 import android.os.Handler;
-import android.support.annotation.IntRange;
 
 import com.jianyuyouhun.mobile.okrequester.library.HttpHolder;
+
+import androidx.annotation.IntRange;
 
 
 /**
  * 进度监听回调
  * <p>
- * Created by wangyu on 2018/6/21.
+ *
+ * @author wangyu
+ * @date 2018/6/21
  */
 
-public abstract class OnProgressListener implements ProgressCallback {
+public abstract class AbstractOnProgressListener implements ProgressCallback {
     private boolean started;
     private long lastRefreshTime = 0L;
     private long lastBytesWritten = 0L;
-    private int minTime;//建议最小回调时间100ms，避免频繁回调
+    private static final double HUNDRED_PERCENT = 1;
+    /** 建议最小回调时间100ms，避免频繁回调 */
+    private int minTime;
 
     private Handler handler = HttpHolder.getInstance().getHandler();
 
-    public OnProgressListener(@IntRange(from = 0, to = Integer.MAX_VALUE) int duration) {
+    public AbstractOnProgressListener(@IntRange(from = 0, to = Integer.MAX_VALUE) int duration) {
         this.minTime = duration;
     }
 
-    public OnProgressListener() {
+    public AbstractOnProgressListener() {
         this(100);
     }
 
@@ -50,8 +55,8 @@ public abstract class OnProgressListener implements ProgressCallback {
             lastRefreshTime = System.currentTimeMillis();
             lastBytesWritten = numBytes;
         }
-        if (numBytes == totalBytes || percent >= 1F) {
-            handler.post(() -> onProgressFinish());
+        if (numBytes == totalBytes || percent >= HUNDRED_PERCENT) {
+            handler.post(this::onProgressFinish);
         }
     }
 
@@ -80,7 +85,7 @@ public abstract class OnProgressListener implements ProgressCallback {
     /**
      * 下载失败
      *
-     * @param e
+     * @param e 异常信息
      */
     public abstract void onFailed(Exception e);
 }

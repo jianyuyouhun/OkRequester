@@ -1,20 +1,21 @@
 package com.jianyuyouhun.mobile.okrequester;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.jianyuyouhun.mobile.okrequester.library.listener.ErrorCode;
 import com.jianyuyouhun.mobile.okrequester.library.requester.ApiInterface;
-import com.jianyuyouhun.mobile.okrequester.library.requester.BaseJsonRequester;
 import com.jianyuyouhun.mobile.okrequester.library.requester.BaseRequester;
 
 import java.util.Map;
 
-import static java.net.HttpURLConnection.HTTP_OK;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * 测试页面
+ * @author wangyu
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override

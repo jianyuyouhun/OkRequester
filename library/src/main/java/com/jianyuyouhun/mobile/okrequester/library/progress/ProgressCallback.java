@@ -2,7 +2,9 @@ package com.jianyuyouhun.mobile.okrequester.library.progress;
 
 /**
  * 进度接口
- * Created by wangyu on 2018/6/21.
+ *
+ * @author wangyu
+ * @date 2018/6/21
  */
 
 public interface ProgressCallback {

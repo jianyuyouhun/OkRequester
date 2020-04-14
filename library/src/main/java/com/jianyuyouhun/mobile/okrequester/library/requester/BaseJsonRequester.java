@@ -1,15 +1,18 @@
 package com.jianyuyouhun.mobile.okrequester.library.requester;
 
-import android.support.annotation.NonNull;
 
 
 import com.jianyuyouhun.mobile.okrequester.library.listener.OnResultListener;
 
 import org.json.JSONObject;
 
+import androidx.annotation.NonNull;
+
 /**
  * json格式请求基类
- * Created by wangyu on 2018/6/25.
+ *
+ * @author wangyu
+ * @date 2018/6/25
  */
 
 public abstract class BaseJsonRequester<T> extends BaseRequester<T, JSONObject> {

@@ -2,9 +2,15 @@ package com.jianyuyouhun.mobile.okrequester.library.requester;
 
 /**
  * WebApi接口定义
- * Created by wangyu on 2018/3/27.
+ *
+ * @author wangyu
+ * @date 2018/3/27
  */
 
 public interface ApiInterface {
+    /**
+     * 请求api的url
+     * @return  url
+     */
     String getApiUrl();
 }

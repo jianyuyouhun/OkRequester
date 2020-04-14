@@ -8,8 +8,10 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
+ * DefaultProcessListener
  *
- * Created by wangyu on 2018/6/10.
+ * @author wangyu
+ * @date 2018/6/10
  */
 
 public class DefaultProcessListener implements RequestProcessListener {
@@ -34,7 +36,8 @@ public class DefaultProcessListener implements RequestProcessListener {
 
     @Override
     public void onError(String url, String route, Exception e) {
-        if (HttpHolder.isDebug) {//调试模式下打印web请求日志
+        //调试模式下打印web请求日志
+        if (HttpHolder.isDebug) {
             String string = String.format(Locale.getDefault(), "response, url = %s, error = %s", url, e);
             Logger.i(TAG, string);
         }

@@ -20,6 +20,7 @@ import okhttp3.ResponseBody;
 
 /**
  * 进度回调请求体/响应体包装类
+ * @author wangyu
  */
 public class ProgressHelper {
     /**
@@ -29,7 +30,7 @@ public class ProgressHelper {
      * @param progressListener 进度回调监听
      * @return 带进度的请求体，使用此请求体进行请求
      */
-    public static RequestBody withProgress(RequestBody requestBody, OnProgressListener progressListener) {
+    public static RequestBody withProgress(RequestBody requestBody, AbstractOnProgressListener progressListener) {
         if (requestBody == null) {
             throw new IllegalArgumentException("requestBody == null");
         }
@@ -46,7 +47,7 @@ public class ProgressHelper {
      * @param progressListener 进度回调监听
      * @return 带进度的响应体，使用此响应体进行响应数据的读取
      */
-    public static ResponseBody withProgress(ResponseBody responseBody, OnProgressListener progressListener) {
+    public static ResponseBody withProgress(ResponseBody responseBody, AbstractOnProgressListener progressListener) {
         if (responseBody == null) {
             throw new IllegalArgumentException("responseBody == null");
         }

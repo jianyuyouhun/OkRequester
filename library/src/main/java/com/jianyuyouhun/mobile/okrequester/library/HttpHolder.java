@@ -3,7 +3,6 @@ package com.jianyuyouhun.mobile.okrequester.library;
 import android.os.Handler;
 import android.os.Looper;
 
-
 import com.jianyuyouhun.mobile.okrequester.library.listener.DefaultProcessListener;
 import com.jianyuyouhun.mobile.okrequester.library.listener.RequestProcessListener;
 
@@ -16,7 +15,9 @@ import okhttp3.OkHttpClient;
 
 /**
  * http执行环境
- * Created by wangyu on 2018/6/9.
+ *
+ * @author wangyu
+ * @date 2018/6/9
  */
 
 public class HttpHolder {

@@ -30,7 +30,7 @@
 
 
 	@RequestMethod(HttpMethod.POST)//定义请求方式，子类可覆盖,加上isFinal = true可避免子类覆盖，比如multipart类型的文件上传，可见MultiPartUploadRequester
-	@BodyCreator(JsonBodyCreator::class)//定义参数封装方式
+	@BodyCreator(MonoLayerJsonBodyCreator::class)//定义参数封装方式
 	abstract class BaseHttpRequester<T>(
 	    listener: OnResultListener<T>
 	) :

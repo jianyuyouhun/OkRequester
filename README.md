@@ -109,7 +109,7 @@
 
 页面调用：
 
-	GetMeetingListRequester(OnResultListener<Info> { code, info, msg -> 
+	GetMeetingListRequester(OnResultListener<List<Info>> { code, list, msg -> 
 		//code为自定义值，结合实际进行
 		when(code) {
 			0->{}

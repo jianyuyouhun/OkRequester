@@ -117,3 +117,5 @@
 			else->{}
 		}
 	}).execute()
+
+此外还内置断点下载请求ContinuableDownloadRequester，和上传文件请求MultiPartUploadRequester

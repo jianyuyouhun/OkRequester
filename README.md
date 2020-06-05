@@ -74,7 +74,8 @@
 	    listener: OnResultListener<List<Info>>) :
 	    BaseHttpRequester<List<Info>>(listener, false) {
 	    override fun onDumpData(`in`: JSONObject): List<Info>? {
-	        return JsonUtil.toList(`in`.getJSONArray("data"), Info::class.java)
+	    	//进行json转实体类工作，例如
+	        // return JsonUtil.toList(`in`.getJSONArray("data"), Info::class.java)
 	    }
 	
 	    override fun onPutParams(params: MutableMap<String, Any>) {

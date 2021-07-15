@@ -57,9 +57,13 @@ public class HttpHolder {
 
     public synchronized OkHttpClient getOkHttpClient() {
         if (okHttpClient == null) {
-            okHttpClient = new OkHttpClient();
+            okHttpClient = new OkHttpClient.Builder().build();
         }
         return okHttpClient;
+    }
+
+    public void setOkHttpClient(OkHttpClient client) {
+        this.okHttpClient = client;
     }
 
     public void registerRequestProcessListener(RequestProcessListener listener) {
